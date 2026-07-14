@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#14263B" />
+<title>Every Pound — Monthly Money Tracker</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="privacy-strip" id="privacyStrip">
+  <span>🔒 Every figure you enter stays on this device only. Nothing is sent anywhere.</span>
+  <button class="privacy-dismiss" id="dismissPrivacy" aria-label="Dismiss">Got it</button>
+</div>
+
+<header class="app-header">
+  <div class="brand">
+    <span class="brand-mark">£</span>
+    <div>
+      <h1>Every Pound</h1>
+      <p class="tagline">Track where each one goes</p>
+    </div>
+  </div>
+  <button class="icon-btn" id="openSettings" aria-label="Settings">⚙︎</button>
+</header>
+
+<nav class="month-bar">
+  <button class="month-nav" id="prevMonth" aria-label="Previous month">‹</button>
+  <div class="month-label" id="monthLabel">—</div>
+  <button class="month-nav" id="nextMonth" aria-label="Next month">›</button>
+</nav>
+
+<main class="wrap">
+
+  <!-- SIGNATURE: allocation bar -->
+  <section class="card allocation-card">
+    <div class="card-eyebrow">This month's income, allocated</div>
+    <div class="alloc-headline">
+      <span class="alloc-left-label">Left after everything</span>
+      <span class="alloc-left-value" id="moneyLeft">£0.00</span>
+    </div>
+    <div class="alloc-bar" id="allocBar" role="img" aria-label="Allocation of income across categories"></div>
+    <div class="alloc-legend" id="allocLegend"></div>
+  </section>
+
+  <!-- Summary tiles -->
+  <section class="tiles">
+    <div class="tile">
+      <div class="tile-label">Income</div>
+      <div class="tile-value" id="tileIncome">£0</div>
+    </div>
+    <div class="tile">
+      <div class="tile-label">Spent / committed</div>
+      <div class="tile-value" id="tileOut">£0</div>
+    </div>
+    <div class="tile">
+      <div class="tile-label">Saved this month</div>
+      <div class="tile-value accent-green" id="tileSaved">£0</div>
+    </div>
+    <div class="tile">
+      <div class="tile-label">Savings rate</div>
+      <div class="tile-value" id="tileRate">0%</div>
+    </div>
+  </section>
+
+  <!-- Savings goal -->
+  <section class="card goal-card">
+    <div class="goal-head">
+      <div class="card-eyebrow">Savings goal</div>
+      <button class="link-btn" id="editGoal">Edit</button>
+    </div>
+    <div class="goal-progress-track"><div class="goal-progress-fill" id="goalFill"></div></div>
+    <div class="goal-row">
+      <span id="goalCurrent">£0 saved</span>
+      <span id="goalTarget">of £0</span>
+    </div>
+    <p class="goal-note" id="goalNote"></p>
+  </section>
+
+  <!-- Ledger -->
+  <section class="card ledger-card">
+    <div class="ledger-head">
+      <div class="card-eyebrow">The ledger — where every pound goes</div>
+    </div>
+    <div class="ledger-cols">
+      <span class="lh-cat">Category</span>
+      <span class="lh-num">Budget</span>
+      <span class="lh-num">Actual</span>
+      <span class="lh-num">Left</span>
+    </div>
+    <div id="ledgerBody"></div>
+    <button class="add-row" id="addCategory">+ Add category</button>
+  </section>
+
+  <section class="data-actions">
+    <button class="ghost-btn" id="exportData">Back up my data</button>
+    <button class="ghost-btn" id="importData">Restore from backup</button>
+    <input type="file" id="importFile" accept="application/json" hidden />
+  </section>
+
+  <footer class="foot">
+    <p>Blank template. Your numbers never leave this phone.</p>
+    <p class="foot-dim">Open-source personal tool · works offline</p>
+  </footer>
+</main>
+
+<!-- Settings sheet -->
+<div class="sheet-backdrop" id="settingsBackdrop" hidden></div>
+<aside class="sheet" id="settingsSheet" hidden aria-label="Settings">
+  <div class="sheet-head">
+    <h2>Setup</h2>
+    <button class="icon-btn" id="closeSettings" aria-label="Close">✕</button>
+  </div>
+  <div class="sheet-body">
+    <label class="field">
+      <span>Monthly income (net take-home)</span>
+      <input type="number" inputmode="decimal" id="incomeInput" placeholder="e.g. 3312" />
+    </label>
+    <label class="field">
+      <span>Give this a name (optional)</span>
+      <input type="text" id="profileName" placeholder="e.g. My budget" />
+    </label>
+    <div class="field">
+      <span>Currency symbol</span>
+      <div class="seg" id="currencySeg">
+        <button data-cur="£" class="on">£</button>
+        <button data-cur="$">$</button>
+        <button data-cur="€">€</button>
+        <button data-cur="₦">₦</button>
+      </div>
+    </div>
+    <hr />
+    <div class="field">
+      <span>Reset</span>
+      <button class="danger-btn" id="resetMonth">Clear this month's actuals</button>
+      <button class="danger-btn" id="resetAll">Erase everything</button>
+    </div>
+    <p class="sheet-hint">Tip: after you add your categories and budgets once, they carry into every new month automatically — you only fill in the Actual column each month.</p>
+  </div>
+</aside>
+
+<!-- Goal editor -->
+<div class="sheet-backdrop" id="goalBackdrop" hidden></div>
+<aside class="sheet compact" id="goalSheet" hidden aria-label="Edit goal">
+  <div class="sheet-head"><h2>Savings goal</h2><button class="icon-btn" id="closeGoal" aria-label="Close">✕</button></div>
+  <div class="sheet-body">
+    <label class="field"><span>Target amount</span><input type="number" inputmode="decimal" id="goalTargetInput" placeholder="e.g. 10000" /></label>
+    <label class="field"><span>Amount already saved (starting point)</span><input type="number" inputmode="decimal" id="goalStartInput" placeholder="e.g. 0" /></label>
+    <label class="field"><span>Target date</span><input type="month" id="goalDateInput" /></label>
+    <button class="primary-btn" id="saveGoal">Save goal</button>
+  </div>
+</aside>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
